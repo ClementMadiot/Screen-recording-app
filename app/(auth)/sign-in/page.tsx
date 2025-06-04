@@ -1,8 +1,13 @@
+"use client";
+import { authClient } from "@/lib/auth.client";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
 const page = () => {
+  const handleSignIn = async () => {
+    return await authClient.signIn.social({ provider: 'google'});
+  };
   return (
     <main className="sign-in">
       <aside className="testimonial">
@@ -63,9 +68,10 @@ const page = () => {
             <h1>SnapCast</h1>
           </Link>
           <p>
-            Create and share your very first <span>SnapCast video</span> in no time!
+            Create and share your very first <span>SnapCast video</span> in no
+            time!
           </p>
-          <button>
+          <button onClick={handleSignIn}>
             <Image
               src="/assets/icons/google.svg"
               alt="Google"
@@ -76,7 +82,7 @@ const page = () => {
           </button>
         </section>
       </aside>
-      <div className="overlay"/>
+      <div className="overlay" />
     </main>
   );
 };
