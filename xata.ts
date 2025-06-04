@@ -2,7 +2,7 @@
 import { buildClient } from "@xata.io/client";
 import type { BaseClientOptions } from "@xata.io/client";
 
-
+// eslint-disable-next-line
 export type DatabaseSchema = {};
 
 const DatabaseClient = buildClient();
