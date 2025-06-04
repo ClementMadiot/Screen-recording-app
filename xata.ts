@@ -2,13 +2,13 @@
 import { buildClient } from "@xata.io/client";
 import type { BaseClientOptions } from "@xata.io/client";
 
-// eslint-disable-next-line
+
 export type DatabaseSchema = {};
 
 const DatabaseClient = buildClient();
 
 const defaultOptions = {
-  databaseURL: "https://Cl-ment-Madiot-s-workspace-qpk86g.eu-central-1.xata.sh/db/cm_snapcast:main",
+  databaseURL: process.env.DATABASE_URL,
   apiKey: process.env.XATA_API_KEY,
   branch: "main",
 };

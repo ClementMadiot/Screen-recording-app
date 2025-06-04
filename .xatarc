@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://Cl-ment-Madiot-s-workspace-qpk86g.eu-central-1.xata.sh/db/cm_snapcast",
+  "codegen": {
+    "output": "./xata.ts"
+  }
+}
