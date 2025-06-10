@@ -1,7 +1,10 @@
 // Reload to sign in to the app if the session is not valid
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+// Arcjet
+import aj, { detectBot, shield }  from "./lib/arcjet";
+import { createMiddleware } from "@arcjet/next";
 
 export async function middleware(request: NextRequest) {
   try {
@@ -19,6 +22,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 }
+
+const validate = aj
+  .withRule(shield({ mode: "LIVE" }))
+  .withRule(
+    detectBot({
+      mode: "LIVE",
+      allow: ["CATEGORY:SEARCH_ENGINE", "GOOGLE_CRAWLER"],
+    })
+  );
+
+export default createMiddleware(validate)
 
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico|sign-in|assets).*)"],

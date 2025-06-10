@@ -6,6 +6,7 @@ import { BUNNY } from "@/constants";
 import { db } from "@/drizzle/db";
 import { videos } from "@/drizzle/schema";
 import { revalidatePath } from "next/cache";
+import aj, { fixedWindow, request } from "../arcjet";
 
 const VIDEO_STREAN_BASE_URL = BUNNY.STREAM_BASE_URL;
 const THUMBNAILS_STORAGE_BASE_URL = BUNNY.STORAGE_BASE_URL;
@@ -26,8 +27,27 @@ const getSessionUserId = async (): Promise<string> => {
 };
 
 const revalidatePaths = (paths: string[]) => {
-  paths.forEach(path => revalidatePath(path) );
-}
+  paths.forEach((path) => revalidatePath(path));
+};
+
+// Regule upload video per minute with Arcjet
+const validateWithArcjet = async (fingerprint: string) => {
+  const rateLimit = aj.withRule(
+    fixedWindow({
+      mode: "LIVE",
+      window: "1m",
+      max: 2,
+      characteristics: ["fingerprint"],
+    })
+  );
+
+  const req = await request();
+  const decision = await rateLimit.protect(req, { fingerprint });
+
+  if (decision.isDenied()) {
+    throw new Error("Rate limit exceeded. Please try again later.");
+  }
+};
 
 //** Server Actions **/
 
@@ -74,6 +94,8 @@ export const getThumbnailUploadUrl = withErrorHandling(
 export const saveVideoDetails = withErrorHandling(
   async (videoDetails: VideoDetails) => {
     const userId = await getSessionUserId();
+    // Validate user upload rate limit
+    await validateWithArcjet(userId)
 
     // update title & description
     await apiFetch(
@@ -95,7 +117,8 @@ export const saveVideoDetails = withErrorHandling(
       updatedAt: new Date(),
     });
 
-    revalidatePaths(['/'])
+    revalidatePaths(["/"]);
 
     return { videoId: videoDetails.videoId };
-});
+  }
+);
