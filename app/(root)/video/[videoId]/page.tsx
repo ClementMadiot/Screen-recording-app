@@ -1,9 +1,21 @@
-import React from 'react'
+import VideoPlayer from "@/components/VideoPlayer"
+import { getVideoById } from "@/lib/actions/video"
 
-const page = () => {
+const page = async ({ params }: Params) => {
+  const { videoId } = await params
+
+  const { user, video } = await getVideoById(videoId)
+
+  if (!video) {
+    return (
+      <main className='wrapper page'>
+        <h1>Video not found</h1>
+      </main>
+    )
+  }
   return (
     <main className='wrapper page'>
-      video Details
+      <VideoPlayer videoId={video.id} />
     </main>
   )
 }
